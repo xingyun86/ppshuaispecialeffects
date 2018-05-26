@@ -66,6 +66,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\SpecialEffects.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -83,7 +84,7 @@ BEGIN
 END
 
 IDD_SPECIALEFFECTS_DIALOG DIALOGEX 0, 0, 491, 288
-STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "窗口特效"
 FONT 9, "宋体", 0, 0, 0x1
@@ -187,7 +188,20 @@ END
 //
 
 IDB_BITMAP_MAP          BITMAP                  "res\\MAP.BMP"
+
 IDB_BITMAP_SVN          BITMAP                  "res\\tortoisemerge_logoflipped.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SPECIALEFFECTS_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

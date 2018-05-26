@@ -42,6 +42,11 @@ public:
 	CPictureHolder	m_pictureHolder;
 	CDIBSectionLite	m_bmpRenderSource;
 	CDIBSectionLite m_bmpRenderTarget;
+	CDIBSectionLite	m_bmpRenderSourceMax;
+	CDIBSectionLite m_bmpRenderTargetMax;
+
+	CDIBSectionLite	* m_pBmpRenderSource;
+	CDIBSectionLite * m_pBmpRenderTarget;
 
 	CFireRoutine	m_FireRoutine;
 	CWaterRoutine	m_WaterRoutine;
@@ -50,6 +55,7 @@ public:
 	BOOL			m_bRunFire;
 	BOOL			m_bRunWater;
 	BOOL			m_bRunPlasma;
+
 // Implementation
 protected:
 	HICON m_hIcon;
@@ -59,14 +65,20 @@ protected:
 	virtual BOOL OnInitDialog();
 	virtual void OnCancel(){
 		KillTimer(m_nTimer);
+		m_bmpRenderSource.DeleteObject();
+		m_bmpRenderTarget.DeleteObject();
+		m_bmpRenderSourceMax.DeleteObject();
+		m_bmpRenderTargetMax.DeleteObject();
+		
 		CDialog::OnCancel();
 	}
-	void OnReSizeWindow();
+	void OnResizeWindow(UINT nID);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg void OnTimer(UINT nIDEvent);
-	afx_msg void OnButtonanimate();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnButtonAnimate();
 	afx_msg void OnButtonstop();
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
@@ -77,8 +89,6 @@ protected:
 	afx_msg void OnReleasedcaptureSliderfirealpha(NMHDR* pNMHDR, LRESULT* pResult);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnExitSizeMove();
 };
 
 //{{AFX_INSERT_LOCATION}}

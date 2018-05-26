@@ -277,47 +277,48 @@ BOOL CDIBSectionLite::GetDither()
 // --- Returns : TRUE on success
 // --- Effect : Draws the image 1:1 on the device context
 BOOL CDIBSectionLite::Draw(CDC* pDC, CPoint ptDest, BOOL bForceBackground /*=FALSE*/ ) 
-{ 
-    if (!m_hBitmap)
-        return FALSE;
-
+{
+	BOOL bResult = FALSE;
+	CPoint SrcOrigin(0,0);
     CSize size = GetSize();
-    CPoint SrcOrigin = CPoint(0,0);
+	CPalette* pOldPalette = NULL;
+		   
+	if (m_hBitmap)
+	{
+		if (GetDither() && GetBitCount() >= 8)
+		{
+			DrawDibSetPalette(m_hDrawDib, (HPALETTE)m_Palette);
+			DrawDibRealize(m_hDrawDib, pDC->GetSafeHdc(), bForceBackground);
 
-    BOOL bResult = FALSE;
+			bResult = DrawDibDraw(m_hDrawDib, pDC->GetSafeHdc(),
+				ptDest.x, ptDest.y, size.cx, size.cy,
+				GetBitmapInfoHeader(), GetDIBits(),
+				SrcOrigin.x, SrcOrigin.y, size.cx, size.cy,
+				0/*DDF_HALFTONE*/);
+		}
+		else
+		{			
+			if (m_Palette.m_hObject && UsesPalette(pDC))
+			{
+				pOldPalette = pDC->SelectPalette(&m_Palette, bForceBackground);
+				pDC->RealizePalette();
+			}
 
-    if (GetDither() && GetBitCount() >= 8)
-    {
-        DrawDibSetPalette( m_hDrawDib, (HPALETTE)m_Palette);
-        DrawDibRealize( m_hDrawDib,  pDC->GetSafeHdc(),  bForceBackground);
-        
-        bResult = DrawDibDraw(m_hDrawDib, pDC->GetSafeHdc(), 
-                              ptDest.x, ptDest.y, size.cx, size.cy, 
-                              GetBitmapInfoHeader(), GetDIBits(), 
-                              SrcOrigin.x, SrcOrigin.y, size.cx, size.cy, 
-                              0/*DDF_HALFTONE*/);
-    }
-    else
-    {
-        CPalette* pOldPalette = NULL;
-        if (m_Palette.m_hObject && UsesPalette(pDC))
-        {
-            pOldPalette = pDC->SelectPalette(&m_Palette, bForceBackground);
-            pDC->RealizePalette();
-        }
+			bResult = SetDIBitsToDevice(pDC->GetSafeHdc(),
+				ptDest.x, ptDest.y,
+				size.cx, size.cy,
+				SrcOrigin.x, SrcOrigin.y,
+				SrcOrigin.y, size.cy - SrcOrigin.y,
+				GetDIBits(), GetBitmapInfo(),
+				m_iColorDataType);
 
-        bResult = SetDIBitsToDevice(pDC->GetSafeHdc(), 
-                                    ptDest.x, ptDest.y, 
-                                    size.cx, size.cy,
-                                    SrcOrigin.x, SrcOrigin.y,
-                                    SrcOrigin.y, size.cy - SrcOrigin.y, 
-                                    GetDIBits(), GetBitmapInfo(), 
-                                    m_iColorDataType); 
+			if (pOldPalette)
+			{
+				pDC->SelectPalette(pOldPalette, FALSE);
+			}
+		}
+	}
 
-        if (pOldPalette)
-            pDC->SelectPalette(pOldPalette, FALSE);
-    }
-    
     return bResult;
 }
 
@@ -331,49 +332,47 @@ BOOL CDIBSectionLite::Draw(CDC* pDC, CPoint ptDest, BOOL bForceBackground /*=FAL
 // --- Effect : Stretch draws the image to the desired size on the device context
 BOOL CDIBSectionLite::Stretch(CDC* pDC, CPoint ptDest, CSize size, 
                               BOOL bForceBackground /*=FALSE*/) 
-{ 
-    if (!m_hBitmap)
-        return FALSE;
-
+{
+	BOOL bResult = FALSE;
     CSize imagesize = GetSize();
+	CPalette* pOldPalette = NULL;
     CPoint SrcOrigin = CPoint(0,0);
+	    
+	if (m_hBitmap)
+	{
+		if (GetDither() && GetBitCount() >= 8)
+		{
+			DrawDibSetPalette(m_hDrawDib, (HPALETTE)m_Palette);
+			DrawDibRealize(m_hDrawDib, pDC->GetSafeHdc(), bForceBackground);
 
-    BOOL bResult = FALSE;
+			bResult = DrawDibDraw(m_hDrawDib, pDC->GetSafeHdc(),
+				ptDest.x, ptDest.y, size.cx, size.cy,
+				GetBitmapInfoHeader(), GetDIBits(),
+				SrcOrigin.x, SrcOrigin.y, imagesize.cx, imagesize.cy,
+				0/*DDF_HALFTONE*/);
+		}
+		else
+		{
+			if (m_Palette.m_hObject && UsesPalette(pDC))
+			{
+				pOldPalette = pDC->SelectPalette(&m_Palette, bForceBackground);
+				pDC->RealizePalette();
+			}
 
-    if (GetDither() && GetBitCount() >= 8)
-    {
-        DrawDibSetPalette( m_hDrawDib, (HPALETTE)m_Palette);
-        DrawDibRealize( m_hDrawDib,  pDC->GetSafeHdc(),  bForceBackground);
-        
-        bResult = DrawDibDraw(m_hDrawDib, pDC->GetSafeHdc(), 
-                              ptDest.x, ptDest.y, size.cx, size.cy, 
-                              GetBitmapInfoHeader(), GetDIBits(), 
-                              SrcOrigin.x, SrcOrigin.y, imagesize.cx, imagesize.cy, 
-                              0/*DDF_HALFTONE*/);
-    }
-    else
-    {
-        CPalette* pOldPalette = NULL;
-        if (m_Palette.m_hObject && UsesPalette(pDC))
-        {
-            pOldPalette = pDC->SelectPalette(&m_Palette, bForceBackground);
-            pDC->RealizePalette();
-        }
+			pDC->SetStretchBltMode(COLORONCOLOR);
 
-        pDC->SetStretchBltMode(COLORONCOLOR);
+			bResult = StretchDIBits(pDC->GetSafeHdc(),
+				ptDest.x, ptDest.y,
+				size.cx, size.cy,
+				SrcOrigin.x, SrcOrigin.y,
+				imagesize.cx, imagesize.cy,
+				GetDIBits(), GetBitmapInfo(),
+				m_iColorDataType, SRCCOPY);
 
-        bResult = StretchDIBits(pDC->GetSafeHdc(), 
-                                ptDest.x, ptDest.y, 
-                                size.cx, size.cy,
-                                SrcOrigin.x, SrcOrigin.y,
-                                imagesize.cx, imagesize.cy, 
-                                GetDIBits(), GetBitmapInfo(), 
-                                m_iColorDataType, SRCCOPY); 
-
-        if (pOldPalette)
-            pDC->SelectPalette(pOldPalette, FALSE);
-    }
-
+			if (pOldPalette)
+				pDC->SelectPalette(pOldPalette, FALSE);
+		}
+	}
     return bResult;
 }
 

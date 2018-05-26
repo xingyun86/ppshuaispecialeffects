@@ -27,24 +27,28 @@ CWaterRoutine::CWaterRoutine()
 CWaterRoutine::~CWaterRoutine()
 {
 	// Cleanup
-	if(m_iHeightField1 != NULL)
+	if (m_iHeightField1 != NULL)
+	{
 		free(m_iHeightField1);
-
-	if(m_iHeightField2 != NULL)
+	}
+	if (m_iHeightField2 != NULL)
+	{
 		free(m_iHeightField2);
-
+	}
 	m_iHeightField1 = NULL;
 	m_iHeightField2 = NULL;
 }
 void CWaterRoutine::Create(int iWidth,int iHeight)
 {
 	// Cleanup
-	if(m_iHeightField1 != NULL)
+	if (m_iHeightField1 != NULL)
+	{
 		free(m_iHeightField1);
-
-	if(m_iHeightField2 != NULL)
+	}
+	if (m_iHeightField2 != NULL)
+	{
 		free(m_iHeightField2);
-
+	}
 	m_iHeightField1 = NULL;
 	m_iHeightField2 = NULL;
 
@@ -82,9 +86,7 @@ void CWaterRoutine::Render(DWORD* pSrcImage,DWORD* pTargetImage)
 	}
 	CalcWater(m_iHpage,m_density);
 
-
 	m_iHpage ^= 1;
-
 }
 void CWaterRoutine::CalcWater(int npage, int density)
 {
@@ -516,7 +518,7 @@ void CWaterRoutine::DrawWaterWithLight(int page, int LightModifier,DWORD* pSrcIm
   DWORD c;
 
   int offset=m_iWidth + 1;
-  long lIndex;
+  long lIndex = 0;
   long lBreak = m_iWidth*m_iHeight;
 
   int *ptr = &m_iHeightField1[0];

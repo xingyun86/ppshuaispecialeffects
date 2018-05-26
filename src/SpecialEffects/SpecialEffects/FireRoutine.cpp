@@ -29,46 +29,56 @@ CFireRoutine::CFireRoutine()
 CFireRoutine::~CFireRoutine()
 {
 	//Clean up
-	if(m_pFireBits != NULL)
+	if (m_pFireBits != NULL)
+	{
 		free(m_pFireBits);
-	if(m_pYIndexes != NULL)
+	}
+	if (m_pYIndexes != NULL)
+	{
 		free(m_pYIndexes);
-
+	}
 	m_pFireBits = NULL;
 	m_pYIndexes = NULL;
 }
 
-void CFireRoutine::InitFire()
+void CFireRoutine::Create(int iWidth, int iHeight)
 {
 	// Get Rid of anything already there
 	//Clean up
-	if(m_pFireBits != NULL)
+	if (m_pFireBits != NULL)
+	{
 		free(m_pFireBits);
-	if(m_pYIndexes != NULL)
+	}
+	if (m_pYIndexes != NULL)
+	{
 		free(m_pYIndexes);
-
+	}
 	m_pFireBits = NULL;
 	m_pYIndexes = NULL;
 
 	// Add three to the height
-	m_iHeight+=3;
+	iHeight += 3;
 
-	m_pYIndexes = (LONG *)malloc(m_iHeight * sizeof(LONG));
+	m_pYIndexes = (LONG *)malloc(iHeight * sizeof(LONG));
 
-	m_pFireBits = (BYTE *)malloc(m_iWidth * m_iHeight * sizeof(BYTE));
+	m_pFireBits = (BYTE *)malloc(iWidth * iHeight * sizeof(BYTE));
 
 	// Clear the Fire bits
-	memset(m_pFireBits,0,(m_iWidth*m_iHeight));
+	memset(m_pFireBits, 0, (iWidth*iHeight));
 	// do all the y index pre-calc..
-	for (int y = 0; y < m_iHeight; y++)  
-		m_pYIndexes[y] = y * m_iWidth;  
+	for (int y = 0; y < iHeight; y++)
+	{
+		m_pYIndexes[y] = y * iWidth;
+	}
+
+	m_iWidth = iWidth;
+	m_iHeight = iHeight;
 
 	// Create our pallete
-
 	InitPallette();
 	ClrHotSpots();
-
 }
+
 void CFireRoutine::ClrHotSpots()
 {
 	// clear the fire line
@@ -85,47 +95,47 @@ void CFireRoutine::InitPallette()
 	COLORREF clrStart;
 	COLORREF clrEnd;
 
-	for(int iColor = 1;iColor<4;iColor++)
-	{		
-		clrStart = m_FireColors[iColor-1];
+	for (int iColor = 1; iColor < 4; iColor++)
+	{
+		clrStart = m_FireColors[iColor - 1];
 		clrEnd = m_FireColors[iColor];
-					
+
 		int r, g, b;							// First distance, then starting value
 		float rStep, gStep, bStep;		// Step size for each color
 
 		// Get the color differences
 		r = (GetRValue(clrEnd) - GetRValue(clrStart));
 		g = (GetGValue(clrEnd) - GetGValue(clrStart));
-		b =  (GetBValue(clrEnd) - GetBValue(clrStart));
+		b = (GetBValue(clrEnd) - GetBValue(clrStart));
 
 		int nSteps = max(abs(r), max(abs(g), abs(b)));
-		float fStep = (float)(255/3)/ (float)nSteps;
+		float fStep = (float)(255 / 3) / (float)nSteps;
 		// Calculate the step size for each color
-		rStep = r/(float)nSteps;
-		gStep = g/(float)nSteps;
-		bStep = b/(float)nSteps;
+		rStep = r / (float)nSteps;
+		gStep = g / (float)nSteps;
+		bStep = b / (float)nSteps;
 
 		// Reset the colors to the starting position
 		r = GetRValue(clrStart);
 		g = GetGValue(clrStart);
 		b = GetBValue(clrStart);
 
-		for (int iOnBand = 0; iOnBand < nSteps; iOnBand++) 
+		for (int iOnBand = 0; iOnBand < nSteps; iOnBand++)
 		{
 			//COLORREF color = RGB(r+rStep*iOnBand, g + gStep*iOnBand, b + bStep *iOnBand);
-			COLORREF color = RGB(b + bStep *iOnBand, g + gStep*iOnBand,r+rStep*iOnBand);
+			COLORREF color = RGB(b + bStep *iOnBand, g + gStep*iOnBand, r + rStep*iOnBand);
 
 			long lIndex = (int)(iOnBand * fStep);
 
-			if(lIndex+((iColor-1)*85) < 255)
-				m_pPalletteBuffer[lIndex+((iColor-1)*85)] = color;				
+			if (lIndex + ((iColor - 1) * 85) < 255)
+				m_pPalletteBuffer[lIndex + ((iColor - 1) * 85)] = color;
 		}
 	}
 	// Step on the second color a little bit...
 	clrStart = m_FireColors[0];
 	clrEnd = m_FireColors[1];
 
-	for(int kj=0;kj<m_iFlameHeight;kj++)
+	for (int kj = 0; kj < m_iFlameHeight; kj++)
 		m_pPalletteBuffer[kj] = 0;
 
 	int r, g, b;							// First distance, then starting value
@@ -134,31 +144,31 @@ void CFireRoutine::InitPallette()
 	// Get the color differences
 	r = (GetRValue(clrEnd) - GetRValue(clrStart));
 	g = (GetGValue(clrEnd) - GetGValue(clrStart));
-	b =  (GetBValue(clrEnd) - GetBValue(clrStart));
+	b = (GetBValue(clrEnd) - GetBValue(clrStart));
 
 	int nSteps = max(abs(r), max(abs(g), abs(b)));
-	float fStep = (float)(85-m_iFlameHeight)/ (float)nSteps;
+	float fStep = (float)(85 - m_iFlameHeight) / (float)nSteps;
 	// Calculate the step size for each color
-	rStep = r/(float)nSteps;
-	gStep = g/(float)nSteps;
-	bStep = b/(float)nSteps;
+	rStep = r / (float)nSteps;
+	gStep = g / (float)nSteps;
+	bStep = b / (float)nSteps;
 
 	// Reset the colors to the starting position
 	r = GetRValue(clrStart);
 	g = GetGValue(clrStart);
 	b = GetBValue(clrStart);
 
-	for (int iOnBand = 0; iOnBand < nSteps; iOnBand++) 
+	for (int iOnBand = 0; iOnBand < nSteps; iOnBand++)
 	{
 		//COLORREF color = RGB(r+rStep*iOnBand, g + gStep*iOnBand, b + bStep *iOnBand);
-		COLORREF color = RGB(b + bStep *iOnBand, g + gStep*iOnBand,r+rStep*iOnBand);
+		COLORREF color = RGB(b + bStep *iOnBand, g + gStep*iOnBand, r + rStep*iOnBand);
 
 		long lIndex = (int)(iOnBand * fStep);
 
-		m_pPalletteBuffer[lIndex+(85-m_iFlameHeight)] = color;				
+		m_pPalletteBuffer[lIndex + (85 - m_iFlameHeight)] = color;
 	}
-
 }
+
 // Macro to get a random integer within a specified range */
 #define getrandom( min, max ) (( rand() % (int)((( max ) + 1 ) - ( min ))) + ( min ))
 #include <time.h>

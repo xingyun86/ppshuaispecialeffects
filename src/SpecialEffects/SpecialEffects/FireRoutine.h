@@ -18,7 +18,7 @@ public:
 
 	// Functs (public)
 
-	void		InitFire();
+	void		Create(int iWidth, int iHeight);
 	void		ClrHotSpots();
 	void		InitPallette();
 	void		SetHotSpots();

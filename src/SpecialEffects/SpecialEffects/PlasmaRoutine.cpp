@@ -202,8 +202,10 @@ void CPlasmaRoutine::CalcPlasma()
 void CPlasmaRoutine::Create(int iWidth,int iHeight)
 {
 	//Clean up
-	if(m_pPlasmaBits != NULL)
+	if (m_pPlasmaBits != NULL)
+	{
 		free(m_pPlasmaBits);
+	}
 	m_pPlasmaBits = NULL;
 	
 	m_pPlasmaBits = (BYTE *)malloc(iWidth * iHeight * sizeof(BYTE));

@@ -21,7 +21,7 @@
 #pragma comment(lib, "nafxcw.lib")
 #else
 //如果是RELEASE选项下的UNICODE选项
-#pragma comment(linker,"/ENTRY:WinMainCRTStartup")
+#pragma comment(linker,"/ENTRY:wWinMainCRTStartup")
 #pragma comment(lib, "uafxcw.lib")
 #endif
 
@@ -62,3 +62,5 @@
 
 #endif // !defined(AFX_STDAFX_H__E204F3C2_DFB4_41B6_A679_35B42388C8D2__INCLUDED_)
 #include <afxcontrolbars.h>
+
+#include <thread>
